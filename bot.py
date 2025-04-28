@@ -78,6 +78,7 @@ async def help_command(interaction: discord.Interaction):
         "/월간기록 - 이번 달 공부한 시간 보기\n"
         "/히스토리 [7/30] - 최근 공부 기록 그래프로 보기\n"
         "/뽀모도로 [집중시간] [쉬는시간] - 뽀모도로 타이머 시작하기\n"
+        "/집중종료 - 현재 진행 중인 타이머 종료\n"
         "/도움말 - 명령어 목록 보여주기"
     )
     await interaction.response.send_message(help_text, ephemeral=True)
@@ -103,9 +104,9 @@ async def study_history(interaction: discord.Interaction, days: int = 7):
     # 그래프 그리기
     plt.figure(figsize=(10, 5))
     plt.bar(dates, times)
-    plt.title(f'최근 {days}일 공부 시간')
-    plt.xlabel('날짜')
-    plt.ylabel('공부 시간 (시간)')
+    plt.title(f'Recent {days} Days of Study Time')
+    plt.xlabel('Day')
+    plt.ylabel('Study Time (Hour)')
     plt.xticks(rotation=45)
     plt.tight_layout()
 
