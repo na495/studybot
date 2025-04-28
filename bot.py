@@ -73,14 +73,14 @@ async def monthly_record(interaction: discord.Interaction):
 async def help_command(interaction: discord.Interaction):
     help_text = (
         "사용할 수 있는 명령어 목록:\n"
-        "/일간기록 - 오늘 공부한 시간\n"
-        "/주간기록 - 이번 주 공부한 시간\n"
-        "/월간기록 - 이번 달 공부한 시간\n"
-        "/히스토리 - 최근 공부 기록 그래프\n"
-        "/뽀모도로 - 집중 시간과 휴식 시간 알림\n"
+        "/일간기록 - 오늘 공부한 시간 보기\n"
+        "/주간기록 - 이번 주 공부한 시간 보기\n"
+        "/월간기록 - 이번 달 공부한 시간 보기\n"
+        "/히스토리 [7/30] - 최근 공부 기록 그래프로 보기\n"
+        "/뽀모도로 [집중시간] [쉬는시간] - 뽀모도로 타이머 시작하기\n"
         "/도움말 - 명령어 목록 보여주기"
     )
-    await interaction.response.send_message(help_text)
+    await interaction.response.send_message(help_text, ephemeral=True)
 
 @bot.tree.command(name="히스토리", description="최근 공부 기록을 그래프로 보여줍니다.")
 @app_commands.describe(days="며칠 동안의 공부 기록을 보고 싶나요? (7 또는 30)")
