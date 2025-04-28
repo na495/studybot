@@ -16,7 +16,6 @@ intents.members = True
 class StudyBot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix="/", intents=intents)
-        self.tree = discord.app_commands.CommandTree(self)
         self.study_records = {}
         self.voice_join_times = {}
 
@@ -77,6 +76,8 @@ async def help_command(interaction: discord.Interaction):
         "/일간기록 - 오늘 공부한 시간\n"
         "/주간기록 - 이번 주 공부한 시간\n"
         "/월간기록 - 이번 달 공부한 시간\n"
+        "/히스토리 - 최근 공부 기록 그래프\n"
+        "/뽀모도로 - 집중 시간과 휴식 시간 알림\n"
         "/도움말 - 명령어 목록 보여주기"
     )
     await interaction.response.send_message(help_text)
