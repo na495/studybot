@@ -2,6 +2,9 @@ import discord
 from config import BOT_TOKEN
 from utils.file_handler import load_data, save_data
 import datetime
+from matplotlib import pyplot as plt
+import io
+from discord import app_commands
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -9,9 +12,9 @@ intents.voice_states = True
 intents.guilds = True
 intents.members = True
 
-class StudyBot(discord.Client):
+class StudyBot(commands.Bot):
     def __init__(self):
-        super().__init__(intents=intents)
+        super().__init__(command_prefix="/", intents=intents)
         self.tree = discord.app_commands.CommandTree(self)
         self.study_records = {}
         self.voice_join_times = {}
@@ -76,5 +79,70 @@ async def help_command(interaction: discord.Interaction):
         "/도움말 - 명령어 목록 보여주기"
     )
     await interaction.response.send_message(help_text)
+
+@bot.tree.command(name="히스토리", description="최근 공부 기록을 그래프로 보여줍니다.")
+@app_commands.describe(days="며칠 동안의 공부 기록을 보고 싶나요? (7 또는 30)")
+async def study_history(interaction: discord.Interaction, days: int = 7):
+    if days not in (7, 30):
+        await interaction.response.send_message("7 또는 30만 입력할 수 있어요!", ephemeral=True)
+        return
+
+    now = datetime.datetime.now()
+    user_record = bot.study_records.get(str(interaction.user.id), {})
+
+    dates = []
+    times = []
+
+    for i in range(days-1, -1, -1):
+        day = (now - datetime.timedelta(days=i)).strftime('%Y-%m-%d')
+        dates.append(day[5:])  # MM-DD만 표시
+        times.append(user_record.get(day, 0) / 3600)  # 초를 시간으로 변환
+
+    # 그래프 그리기
+    plt.figure(figsize=(10, 5))
+    plt.bar(dates, times)
+    plt.title(f'최근 {days}일 공부 시간')
+    plt.xlabel('날짜')
+    plt.ylabel('공부 시간 (시간)')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    plt.close()
+
+    file = discord.File(fp=buffer, filename='history.png')
+    await interaction.response.send_message(file=file)
+
+    import asyncio
+
+@bot.tree.command(name="뽀모도로", description="자유롭게 집중 시간과 휴식 시간을 설정합니다.")
+@app_commands.describe(focus_minutes="집중 시간 (분)", rest_minutes="휴식 시간 (분)")
+async def pomodoro(interaction: discord.Interaction, focus_minutes: int, rest_minutes: int):
+    if focus_minutes <= 0 or rest_minutes <= 0:
+        await interaction.response.send_message(
+            "집중 시간과 휴식 시간은 1분 이상이어야 해요!", ephemeral=True
+        )
+        return
+
+    await interaction.response.send_message(
+        f"🎯 {focus_minutes}분 집중 시작합니다! 끝나면 {rest_minutes}분 쉬세요!", ephemeral=True
+    )
+
+    # 공부시간 타이머
+    await asyncio.sleep(focus_minutes * 60)
+
+    await interaction.followup.send(
+        f"⏰ {focus_minutes}분 집중 끝! 🛌 {rest_minutes}분 쉬는 시간 시작!", ephemeral=True
+    )
+
+    # 쉬는시간 타이머
+    await asyncio.sleep(rest_minutes * 60)
+
+    await interaction.followup.send(
+        f"✅ {rest_minutes}분 쉬는 시간 끝났어요! 다시 집중할 준비 완료! 🔥", ephemeral=True
+    )
+
 
 bot.run(BOT_TOKEN)
