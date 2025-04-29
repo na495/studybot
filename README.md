@@ -1,4 +1,4 @@
-# StudyBot (Discord Slash Command Version)
+# StudyBot
 
 ## 기능
 - /일간기록 : 오늘 공부한 시간 보여줌
@@ -7,5 +7,5 @@
 - /도움말 : 명령어 목록 안내
 
 ## 실행 방법
-1. Python 설치 (>= 3.8)
+1. Python 설치
 2. 라이브러리 설치
